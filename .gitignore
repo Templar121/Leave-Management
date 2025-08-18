@@ -1,0 +1,41 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.py.class
+
+# Virtual environments
+.env
+.venv/
+env/
+venv/
+ENV/
+
+# SQLite database
+*.db
+*.sqlite3
+
+# Alembic migrations cache
+alembic.ini
+migrations/versions/*.pyc
+migrations/versions/*.pyo
+
+# Logs
+*.log
+
+# IDE configs
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Pytest cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# FastAPI / Uvicorn cache
+*.pid
