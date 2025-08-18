@@ -1,7 +1,18 @@
+from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from . import models, schemas
+from datetime import date
 
 def create_employee(db: Session, emp: schemas.EmployeeCreate):
+    # 🚫 Duplicate Email Check
+    existing = db.query(models.Employee).filter(models.Employee.email == emp.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already exists")
+
+    # 🚫 Invalid Joining Date (e.g. future date)
+    if emp.joining_date > date.today():
+        raise HTTPException(status_code=400, detail="Joining date cannot be in the future")
+
     new_emp = models.Employee(**emp.dict())
     db.add(new_emp)
     db.commit()
@@ -24,14 +35,29 @@ def apply_leave(db: Session, emp_id: int, leave: schemas.LeaveCreate):
 
 def update_leave_status(db: Session, leave_id: int, status: str):
     leave = db.query(models.Leave).filter(models.Leave.id == leave_id).first()
-    if leave:
-        leave.status = status
-        if status == models.LeaveStatus.APPROVED:
-            emp = leave.employee
-            days = (leave.end_date - leave.start_date).days + 1
-            emp.leave_balance -= days
-        db.commit()
-        db.refresh(leave)
+    if not leave:
+        raise HTTPException(status_code=404, detail="Leave not found")
+
+    # 🚫 Double approval prevention
+    if leave.status == models.LeaveStatus.APPROVED and status == models.LeaveStatus.APPROVED:
+        raise HTTPException(status_code=400, detail="Leave already approved")
+
+    # 🚫 Expired leave cannot be approved
+    from datetime import date
+    if status == models.LeaveStatus.APPROVED and leave.end_date < date.today():
+        raise HTTPException(status_code=400, detail="Cannot approve expired leave")
+
+    leave.status = status
+
+    if status == models.LeaveStatus.APPROVED:
+        emp = leave.employee
+        days = (leave.end_date - leave.start_date).days + 1
+        if emp.leave_balance < days:
+            raise HTTPException(status_code=400, detail="Insufficient balance at approval")
+        emp.leave_balance -= days
+
+    db.commit()
+    db.refresh(leave)
     return leave
 
 def get_leave_balance(db: Session, emp_id: int):

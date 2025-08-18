@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, constr
 from datetime import date
 from enum import Enum
 
@@ -8,9 +8,9 @@ class LeaveStatus(str, Enum):
     rejected = "rejected"
 
 class EmployeeCreate(BaseModel):
-    name: str
+    name: constr(min_length=1)
     email: EmailStr
-    department: str
+    department: constr(min_length=1)
     joining_date: date
 
 class EmployeeResponse(BaseModel):
