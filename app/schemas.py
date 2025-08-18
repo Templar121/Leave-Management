@@ -37,3 +37,11 @@ class LeaveResponse(BaseModel):
 
     class Config:
         orm_mode = True
+
+class HRUserCreate(BaseModel):
+    username: str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

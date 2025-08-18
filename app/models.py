@@ -28,3 +28,11 @@ class Leave(Base):
     status = Column(Enum(LeaveStatus), default=LeaveStatus.PENDING)
 
     employee = relationship("Employee", back_populates="leaves")
+
+
+
+class HRUser(Base):
+    __tablename__ = "hr_users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    password_hash = Column(String, nullable=False)

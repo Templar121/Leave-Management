@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from .. import crud, schemas, database, models
+from ..auth import get_current_hr
+from ..models import HRUser
 
 router = APIRouter(prefix="/leaves", tags=["Leaves"])
 
@@ -38,12 +40,20 @@ def apply_leave(emp_id: int, leave: schemas.LeaveCreate, db: Session = Depends(d
         raise HTTPException(status_code=400, detail="Leave overlaps with existing request")
 
     return crud.apply_leave(db, emp_id, leave)
+
+
 @router.put("/{leave_id}/status")
-def update_status(leave_id: int, status: schemas.LeaveStatus, db: Session = Depends(database.get_db)):
+def update_status(
+    leave_id: int,
+    status: schemas.LeaveStatus,
+    db: Session = Depends(database.get_db),
+    hr=Depends(get_current_hr)   # ✅ HR-only
+):
     leave = crud.update_leave_status(db, leave_id, status)
     if not leave:
         raise HTTPException(status_code=404, detail="Leave not found")
     return leave
+
 
 @router.get("/balance/{emp_id}")
 def leave_balance(emp_id: int, db: Session = Depends(database.get_db)):
