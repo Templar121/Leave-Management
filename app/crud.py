@@ -3,6 +3,11 @@ from sqlalchemy.orm import Session
 from . import models, schemas
 from datetime import date
 
+
+
+def get_all_employees(db: Session):
+    return db.query(models.Employee).all()
+
 def create_employee(db: Session, emp: schemas.EmployeeCreate):
     # 🚫 Duplicate Email Check
     existing = db.query(models.Employee).filter(models.Employee.email == emp.email).first()
@@ -63,3 +68,37 @@ def update_leave_status(db: Session, leave_id: int, status: str):
 def get_leave_balance(db: Session, emp_id: int):
     emp = get_employee(db, emp_id)
     return emp.leave_balance if emp else None
+
+def withdraw_leave(db: Session, leave_id: int):
+    leave = db.query(models.Leave).filter(models.Leave.id == leave_id).first()
+    if not leave:
+        return None
+    if leave.status != models.LeaveStatus.PENDING:
+        # Only pending leaves can be withdrawn
+        return "not_pending"
+    db.delete(leave)
+    db.commit()
+    return "deleted"
+
+def get_all_employees_with_leaves(db: Session):
+    employees = db.query(models.Employee).all()
+    results = []
+    for emp in employees:
+        results.append({
+            "id": emp.id,
+            "name": emp.name,
+            "email": emp.email,
+            "department": emp.department,
+            "joining_date": emp.joining_date,
+            "leave_balance": emp.leave_balance,
+            "leaves": [
+                {
+                    "id": leave.id,
+                    "start_date": leave.start_date,
+                    "end_date": leave.end_date,
+                    "status": leave.status.value,
+                }
+                for leave in emp.leaves
+            ]
+        })
+    return results

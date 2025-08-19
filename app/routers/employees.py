@@ -6,6 +6,11 @@ from ..auth import get_current_hr
 
 router = APIRouter(prefix="/employees", tags=["Employees"])
 
+
+@router.get("/all", response_model=list[schemas.EmployeeResponse])
+def list_employees(db: Session = Depends(database.get_db), hr=Depends(get_current_hr)):
+    return crud.get_all_employees(db)
+
 @router.post("/", response_model=schemas.EmployeeResponse)
 def create_employee(emp: schemas.EmployeeCreate, db: Session = Depends(database.get_db), hr=Depends(get_current_hr)):
     return crud.create_employee(db, emp)

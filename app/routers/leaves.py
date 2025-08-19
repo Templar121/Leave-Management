@@ -61,3 +61,12 @@ def leave_balance(emp_id: int, db: Session = Depends(database.get_db)):
     if balance is None:
         raise HTTPException(status_code=404, detail="Employee not found")
     return {"employee_id": emp_id, "leave_balance": balance}
+
+@router.delete("/{leave_id}/withdraw")
+def withdraw_leave(leave_id: int, db: Session = Depends(database.get_db)):
+    result = crud.withdraw_leave(db, leave_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="Leave not found")
+    if result == "not_pending":
+        raise HTTPException(status_code=400, detail="Only pending leaves can be withdrawn")
+    return {"message": "Leave application withdrawn successfully"}
