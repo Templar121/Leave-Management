@@ -72,6 +72,8 @@ API will be available at: http://127.0.0.1:8000
 
  - POST /auth/login → Login as HR/Admin (returns JWT)
 
+---
+
 ### 👨‍💼 Employee
 
  - POST /employees/ → Add employee (HR only)
@@ -79,6 +81,8 @@ API will be available at: http://127.0.0.1:8000
  - GET /employees/{id} → Get employee by ID
 
  - GET /employees/ → List all employees (HR only)
+
+---
 
 ### 🌴 Leave
 
@@ -92,14 +96,19 @@ API will be available at: http://127.0.0.1:8000
 
  - GET /leaves/employee/{emp_id} → View all leave requests for an employee
 
+---
+
 ### 🛠 Admin
 
  - GET /admin/db-dump → View all employees + leave requests (Admin only)
+
+---
 
 ### ❤️ Health
 
  - GET /health/ → Service health check
 
+ ---
 
 ### 📸 Example API Flow
 
@@ -115,6 +124,8 @@ API will be available at: http://127.0.0.1:8000
 
  - Admin fetches DB dump for auditing.
 
+---
+
 ### ⚡ Edge Cases Handled
 
  - Overlapping leave requests blocked.
@@ -127,6 +138,8 @@ API will be available at: http://127.0.0.1:8000
 
 - Unauthorized access blocked with 401 Unauthorized.
 
+---
+
 ### 📝 Assumptions
 
  - Each employee has 20 leave days/year (configurable).
@@ -134,6 +147,8 @@ API will be available at: http://127.0.0.1:8000
  - HR/Admin users are seeded via .env (no signup flow).
 
  - Employees do not need login for this version (future improvement).
+
+---
 
 ### 🚀 Potential Improvements
 
@@ -148,6 +163,8 @@ API will be available at: http://127.0.0.1:8000
  - Dashboard (React/Angular frontend).
 
  - Export reports in CSV/Excel for HR/Admin.
+
+---
 
 ### 📊 HLD Diagram (Class Diagram)
 
@@ -182,6 +199,8 @@ API will be available at: http://127.0.0.1:8000
                         | - status: enum      |
                         +---------------------+
 
+---
+
 ### 📌 Component Interaction
 
 [Client (Postman/Web)] ---> [FastAPI Backend] ---> [Database]
@@ -200,3 +219,5 @@ FastAPI Modules:
   • GET /leaves/balance/{emp_id}
 - Admin Controller
   • GET /admin/db-dump
+
+---
